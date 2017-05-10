@@ -55,14 +55,22 @@ def linear_reg(train, test):
 # Calculate root mean squared error
 def rmse_metric(true_y, pred):
 	sum_error = 0.0
-	print(true_y)
-	print(pred)
 	for i in range(len(true_y)):
 		pred_error = pred[i] - true_y[i]	
 		sum_error += (pred_error ** 2)
 	mean_error = sum_error / float(len(true_y))
 	return math.sqrt(mean_error)
  
+# Method to calcuate R2
+def R2(true_y, pred, u_y, var_y):
+	num = 0.0
+	print(true_y, pred, u_y)
+	for i in xrange(len(true_y)):
+		num += (true_y[i] - pred[i])**2
+	den = var_y
+	print num, den
+	return (1 - (num/ float(den)))
+
 # Evaluate regression algorithm on training dataset
 def eval_algo(data, algo, split, *args):
 	train, test = split_data(data, split)
@@ -75,16 +83,20 @@ def eval_algo(data, algo, split, *args):
 	true_y = [row[-1] for row in test]
 	x = np.asarray(data)[:,0]
 	y = np.asarray(data)[:,1]
-	#plt.plot(x,y, 'r^--', test_set,pred, 'b--s')
-	#plt.show()
+	plt.plot(x,y, 'r^--', test_set,pred, 'b--s')
+	plt.show()
+	u_y = mean(y)
+	var_y = variance(y, u_y)
 	rmse = rmse_metric(true_y, pred)
-	return rmse
+	r2 = R2(true_y, pred, u_y, var_y)
+	return [rmse,r2]
 
 if __name__=="__main__":
 	df = pd.read_csv('data/data.csv', sep=',', header=None)
 	data = df.values
 	split = 0.6
-	rmse = eval_algo(data, linear_reg, split)
-	print rmse
+	rmse,r2 = eval_algo(data, linear_reg, split)
+	print rmse,r2
+
 
 
